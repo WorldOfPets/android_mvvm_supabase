@@ -24,6 +24,9 @@ class UserViewModel : ViewModel() {
     fun setUser(user:UserModel){
         _user.value = user
     }
+    fun checkUser():Boolean{
+        return _user.value != null
+    }
     suspend fun addUser(user: UserModel){
         _user.value = supabase.from("user").insert(user){
             select()
@@ -31,5 +34,22 @@ class UserViewModel : ViewModel() {
     }
     suspend fun getAllUser(){
         _users.value = supabase.from("user").select().decodeList()
+    }
+    suspend fun updateUser(user:UserModel){
+        _user.value = supabase.from("user").update(user){
+            filter {
+                UserModel::id eq user.id
+            }
+            select()
+        }.decodeSingle()
+    }
+    suspend fun deleteUser(user:UserModel){
+        supabase.from("user").delete{
+            filter {
+                UserModel::id eq user.id
+            }
+        }
+        _user.value = null
+
     }
 }
